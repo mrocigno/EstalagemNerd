@@ -19,7 +19,7 @@ public class SplashPresenter implements Splash.Presenter {
     }
 
     @Override
-    public void setUp() {
+    public void setupListeners() {
         view.setPresenter(this);
     }
 }
