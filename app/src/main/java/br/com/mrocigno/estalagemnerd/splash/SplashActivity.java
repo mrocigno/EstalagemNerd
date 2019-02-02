@@ -37,4 +37,9 @@ public class SplashActivity extends AppCompatActivity implements Splash.View {
     public void setPresenter(Splash.Presenter presenter) {
 
     }
+
+    @Override
+    public void showProgresBar(boolean visible) {
+
+    }
 }

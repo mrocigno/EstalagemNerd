@@ -8,7 +8,7 @@
             <solid android:color="@color/white_transparent"/>
         </shape>
     </item>
-    <item android:width="250dp" android:height="250dp" android:gravity="center">
-        <bitmap android:src="@drawable/logo"/>
+    <item android:width="150dp" android:height="75dp" android:gravity="center">
+        <bitmap android:src="@drawable/banner" android:tint="@android:color/black"/>
     </item>
 </layer-list>

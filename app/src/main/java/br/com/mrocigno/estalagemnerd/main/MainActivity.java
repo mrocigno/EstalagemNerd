@@ -11,9 +11,11 @@ import javax.inject.Inject;
 
 import br.com.mrocigno.estalagemnerd.R;
 import br.com.mrocigno.estalagemnerd.config.AbstractActivity;
+import br.com.mrocigno.estalagemnerd.main.data.MainDataModule;
 import br.com.mrocigno.estalagemnerd.main.home.HomeFragment;
 import br.com.mrocigno.estalagemnerd.main.home.HomePresenter;
 import br.com.mrocigno.estalagemnerd.main.home.HomePresenterModule;
+import br.com.mrocigno.estalagemnerd.modules.DataModule;
 
 public class MainActivity extends AbstractActivity {
 
@@ -39,10 +41,17 @@ public class MainActivity extends AbstractActivity {
 
         DaggerMainComponent.builder()
                 .homePresenterModule(new HomePresenterModule(homeFragment))
+                .dataModule(new DataModule(getActivity()))
                 .build()
                 .inject(this);
 
+        removeFragmentToActivity(getSupportFragmentManager());
         addFragmentToActivity(getSupportFragmentManager(), homeFragment, R.id.contentFrame, "home");
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        playerService.stopSelf();
+    }
 }

@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.Objects;
+
 public abstract class AbstractFragment<T extends BasePresenter> extends Fragment {
 
     public String TAG = "TESTEEE";
@@ -16,6 +18,10 @@ public abstract class AbstractFragment<T extends BasePresenter> extends Fragment
 
     public void setPresenter(T presenter) {
         this.presenter = presenter;
+    }
+
+    public void showProgresBar(boolean visible) {
+        ((AbstractActivity) Objects.requireNonNull(getActivity())).setProgressbarVisible(visible);
     }
 
     View view;

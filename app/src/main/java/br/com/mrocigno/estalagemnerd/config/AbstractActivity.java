@@ -2,8 +2,13 @@ package br.com.mrocigno.estalagemnerd.config;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
@@ -14,17 +19,23 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
+import br.com.mrocigno.estalagemnerd.PlayerService;
 import br.com.mrocigno.estalagemnerd.R;
 import br.com.mrocigno.estalagemnerd.localdata.Preferences;
+import br.com.mrocigno.estalagemnerd.utils.TimerUtils;
 
-public abstract class AbstractActivity extends AppCompatActivity {
+public abstract class AbstractActivity extends AppCompatActivity implements PlayerService.PlayerCallbacks {
     public String TAG = "TESTEEE";
 
     public FloatingActionButton fabBtn_Default;
@@ -33,6 +44,21 @@ public abstract class AbstractActivity extends AppCompatActivity {
     ProgressBar pgrBar_Deafult;
     SearchView srvSearch_Default;
     ImageView imgLogo_Default;
+    ImageView imgPlayPause;
+    SeekBar skbPlayerProgress;
+    TextView txtCurrentTime;
+    TextView txtDuration;
+    TextView txtTitle;
+    LinearLayout lnlPlayer;
+
+    public PlayerService playerService;
+    boolean serviceConnected = false;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        initPlayerService();
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,6 +73,14 @@ public abstract class AbstractActivity extends AppCompatActivity {
         defaultContainer = findViewById(R.id.defaultContainer);
         fabBtn_Default = findViewById(R.id.fabBtn_Default);
         pgrBar_Deafult = findViewById(R.id.pgrBar_Deafult);
+
+        imgPlayPause = findViewById(R.id.imgPlayPause);
+        skbPlayerProgress = findViewById(R.id.skbPlayerProgress);
+        txtCurrentTime = findViewById(R.id.txtCurrentTime);
+        txtDuration = findViewById(R.id.txtDuration);
+        lnlPlayer = findViewById(R.id.lnlPlayer);
+        txtTitle = findViewById(R.id.txtTitle);
+
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -86,6 +120,36 @@ public abstract class AbstractActivity extends AppCompatActivity {
             toolbar.setVisibility(View.GONE);
             pgrBar_Deafult.setVisibility(View.GONE);
         }
+
+        imgPlayPause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(imgPlayPause.getTag() == null){
+                    playerService.playSong();
+                }else{
+                    playerService.pauseSong();
+                }
+            }
+        });
+        skbPlayerProgress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if(fromUser) {
+                    txtCurrentTime.setText(TimerUtils.transformMilisegs(progress));
+                    playerService.playerSeek(progress);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
 
         View v = getLayoutInflater().inflate(getLayoutRes(), null);
         defaultContainer.addView(v);
@@ -188,6 +252,7 @@ public abstract class AbstractActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        initPlayerService();
         Runtime.getRuntime().gc();
         System.gc();
     }
@@ -221,7 +286,6 @@ public abstract class AbstractActivity extends AppCompatActivity {
     }
 
     public static void showFragmentToActivity(@NonNull FragmentManager fragmentManager, @NonNull Fragment fragment) {
-//        if (!fragment.isAdded()) {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.show(fragment);
         for (int i = 0; i < fragmentManager.getFragments().size(); i++) {
@@ -230,7 +294,6 @@ public abstract class AbstractActivity extends AppCompatActivity {
             }
         }
         transaction.commit();
-//        }
     }
 
     public static void removeFragmentToActivity(@NonNull FragmentManager fragmentManager) {
@@ -241,4 +304,87 @@ public abstract class AbstractActivity extends AppCompatActivity {
         transaction.commit();
     }
 
+    private void initPlayerService(){
+        ServiceConnection connection = new ServiceConnection(){
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                PlayerService.PlayerBinder binder = (PlayerService.PlayerBinder)service;
+                playerService = binder.getService();
+                playerService.setCallbacks(AbstractActivity.this);
+                serviceConnected = true;
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                serviceConnected = false;
+            }
+        };
+        Intent service = new Intent(getActivity(), PlayerService.class);
+        bindService(service, connection, Context.BIND_AUTO_CREATE);
+        startService(service);
+    }
+
+    @Override
+    public void playerPrepare() {
+        lnlPlayer.setVisibility(View.VISIBLE);
+        setProgressbarVisible(true);
+        skbPlayerProgress.setProgress(0);
+        txtTitle.setText("Carregando buffer...");
+        txtCurrentTime.setText("--:--");
+        txtDuration.setText("--:--");
+    }
+
+    @Override
+    public void playerCurrent(final int current, final int duration) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.e(TAG, "playerCurrent: " + current + "  " + duration);
+                skbPlayerProgress.setMax(duration);
+                skbPlayerProgress.setProgress(current);
+                txtCurrentTime.setText(TimerUtils.transformMilisegs(current));
+                txtDuration.setText(TimerUtils.transformMilisegs(duration));
+            }
+        });
+    }
+
+    @Override
+    public void playerBuffer(int percent) {
+
+    }
+
+    @Override
+    public void playerComplete() {
+
+    }
+
+    @Override
+    public void playerSeek() {
+        Log.e(TAG, "playerSeek: ");
+    }
+
+    @Override
+    public void playerStart(String title) {
+        imgPlayPause.setImageDrawable(getDrawable(R.drawable.ic_pause_circle));
+        imgPlayPause.setTag(1);
+        setProgressbarVisible(false);
+        txtTitle.setText(title);
+    }
+
+    @Override
+    public void playerPlay() {
+        imgPlayPause.setImageDrawable(getDrawable(R.drawable.ic_pause_circle));
+        imgPlayPause.setTag(1);
+    }
+
+    @Override
+    public void playerPause() {
+        imgPlayPause.setImageDrawable(getDrawable(R.drawable.ic_play_circle));
+        imgPlayPause.setTag(null);
+    }
+
+    @Override
+    public void playerStop() {
+
+    }
 }
