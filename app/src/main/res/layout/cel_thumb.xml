@@ -9,13 +9,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="15dp"
         app:cardBackgroundColor="?colorPrimary"
         android:elevation="2dp"
-        android:foreground="?selectableItemBackground"
-        app:cardCornerRadius="5dp">
+        android:foreground="?selectableItemBackground">
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -46,7 +43,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
-                android:layout_margin="5dp"
+                android:padding="5dp"
+                android:background="@color/black_transparent"
                 android:orientation="horizontal">
 
                 <LinearLayout
@@ -59,14 +57,10 @@
                         android:id="@+id/txtTitle_Cellthumb"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:shadowColor="@android:color/black"
-                        android:shadowDx="0"
-                        android:shadowDy="0"
-                        android:shadowRadius="4"
-                        android:singleLine="true"
                         android:textColor="@android:color/white"
-                        android:textSize="20sp"
                         android:textStyle="bold"
+                        android:layout_marginBottom="5dp"
+                        android:text="teste"
                         android:transitionName="title"/>
 
                     <TextView
@@ -78,6 +72,7 @@
                         android:shadowDx="0"
                         android:shadowDy="0"
                         android:shadowRadius="4"
+                        android:visibility="gone"
                         android:textColor="@android:color/white" />
 
                 </LinearLayout>
@@ -87,7 +82,8 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/play_button" />
+                    android:tint="@android:color/white"
+                    android:src="@drawable/ic_play_circle" />
 
             </LinearLayout>
 
