@@ -12,11 +12,13 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -50,6 +52,9 @@ public abstract class AbstractActivity extends AppCompatActivity implements Play
     TextView txtDuration;
     TextView txtTitle;
     LinearLayout lnlPlayer;
+    LinearLayout lnlBottom;
+    BottomNavigationView bnvMain_Main;
+    public CardView cardPlayer;
 
     public PlayerService playerService;
     boolean serviceConnected = false;
@@ -79,7 +84,10 @@ public abstract class AbstractActivity extends AppCompatActivity implements Play
         txtCurrentTime = findViewById(R.id.txtCurrentTime);
         txtDuration = findViewById(R.id.txtDuration);
         lnlPlayer = findViewById(R.id.lnlPlayer);
+        lnlBottom = findViewById(R.id.lnlBottom);
         txtTitle = findViewById(R.id.txtTitle);
+        bnvMain_Main = findViewById(R.id.bnvMain_Main);
+        cardPlayer = findViewById(R.id.cardPlayer);
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -275,6 +283,10 @@ public abstract class AbstractActivity extends AppCompatActivity implements Play
         }
     }
 
+    public void showBNV(boolean visible){
+        bnvMain_Main.setVisibility(visible? View.VISIBLE : View.GONE);
+    }
+
     public void onClickFab(){}
 
     public static void addFragmentToActivity(@NonNull FragmentManager fragmentManager, @NonNull Fragment fragment, int frameId, String tag) {
@@ -326,7 +338,7 @@ public abstract class AbstractActivity extends AppCompatActivity implements Play
 
     @Override
     public void playerPrepare() {
-        lnlPlayer.setVisibility(View.VISIBLE);
+        cardPlayer.setVisibility(View.VISIBLE);
         setProgressbarVisible(true);
         skbPlayerProgress.setProgress(0);
         txtTitle.setText("Carregando buffer...");

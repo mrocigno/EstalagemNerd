@@ -30,6 +30,12 @@ public class DetailsActivity extends AbstractActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        showBNV(false);
+    }
+
+    @Override
     public void initVars() {
         imgThumb = findViewById(R.id.imgThumb);
         txtTitle = findViewById(R.id.txtTitle);

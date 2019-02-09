@@ -29,6 +29,7 @@ import java.util.List;
 import br.com.mrocigno.estalagemnerd.PlayerService;
 import br.com.mrocigno.estalagemnerd.R;
 import br.com.mrocigno.estalagemnerd.details.DetailsActivity;
+import br.com.mrocigno.estalagemnerd.main.MainActivity;
 import br.com.mrocigno.estalagemnerd.main.data.PodcastsModelVO;
 
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
@@ -108,6 +109,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                 public void onClick(View v) {
                     ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation((Activity) context,
                             Pair.create((View)imgThumb_Cellthumb, "thumb"),
+                            Pair.create((View) ((MainActivity) context).cardPlayer, "cardplayer"),
                             Pair.create((View)txtTitle_Cellthumb, "title"));
                     Intent intent = new Intent(context, DetailsActivity.class);
                     intent.putExtra("thumb", data.getThumb());
