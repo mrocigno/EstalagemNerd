@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -53,6 +54,9 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull HomeAdapter.ViewHolder viewHolder, int i) {
         viewHolder.setData(list.get(i));
+        if(i == (list.size() - 1)){
+            viewHolder.frmGap.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -64,10 +68,12 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
         ImageView imgPlay_Cellthumb;
         ImageView imgThumb_Cellthumb;
+        ImageView imgSave_Cellthumb;
         CardView cardThumb_Cellthumb;
         TextView txtTitle_Cellthumb;
         TextView txtDescription_Cellthumb;
         ProgressBar pgrBar_Cellthumb;
+        FrameLayout frmGap;
 
 
         public ViewHolder(@NonNull View itemView) {
@@ -75,10 +81,12 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
             imgPlay_Cellthumb = itemView.findViewById(R.id.imgPlay_Cellthumb);
             imgThumb_Cellthumb = itemView.findViewById(R.id.imgThumb_Cellthumb);
+            imgSave_Cellthumb = itemView.findViewById(R.id.imgSave_Cellthumb);
             cardThumb_Cellthumb = itemView.findViewById(R.id.cardThumb_Cellthumb);
             txtTitle_Cellthumb = itemView.findViewById(R.id.txtTitle_Cellthumb);
             txtDescription_Cellthumb = itemView.findViewById(R.id.txtDescription_Cellthumb);
             pgrBar_Cellthumb = itemView.findViewById(R.id.pgrBar_Cellthumb);
+            frmGap = itemView.findViewById(R.id.frmGap);
         }
 
         public void setData(final PodcastsModelVO data) {
@@ -109,11 +117,12 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                 public void onClick(View v) {
                     ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation((Activity) context,
                             Pair.create((View)imgThumb_Cellthumb, "thumb"),
+                            Pair.create((View)imgSave_Cellthumb, "save"),
+                            Pair.create((View)imgPlay_Cellthumb, "playbtn"),
                             Pair.create((View) ((MainActivity) context).cardPlayer, "cardplayer"),
                             Pair.create((View)txtTitle_Cellthumb, "title"));
                     Intent intent = new Intent(context, DetailsActivity.class);
-                    intent.putExtra("thumb", data.getThumb());
-                    intent.putExtra("title", data.getTitle());
+                    intent.putExtra("data", data);
                     callback.onCardClick(options, intent);
                 }
             });

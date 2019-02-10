@@ -22,15 +22,8 @@ public class SplashActivity extends AppCompatActivity implements Splash.View {
                 .splashPresenterModule(new SplashPresenterModule(this))
                 .build()
                 .inject(this);
-
-        if(presenter == null){
-            Log.e("TESTEEE", "onCreate: null");
-        }else{
-            Log.e("TESTEEE", "onCreate: " + presenter.teste());
-        }
-
         startActivity(new Intent(SplashActivity.this, MainActivity.class));
-
+        finish();
     }
 
     @Override

@@ -47,6 +47,7 @@ public abstract class AbstractActivity extends AppCompatActivity implements Play
     SearchView srvSearch_Default;
     ImageView imgLogo_Default;
     ImageView imgPlayPause;
+    ImageView imgClose;
     SeekBar skbPlayerProgress;
     TextView txtCurrentTime;
     TextView txtDuration;
@@ -62,7 +63,6 @@ public abstract class AbstractActivity extends AppCompatActivity implements Play
     @Override
     protected void onStart() {
         super.onStart();
-        initPlayerService();
     }
 
     @Override
@@ -80,6 +80,7 @@ public abstract class AbstractActivity extends AppCompatActivity implements Play
         pgrBar_Deafult = findViewById(R.id.pgrBar_Deafult);
 
         imgPlayPause = findViewById(R.id.imgPlayPause);
+        imgClose = findViewById(R.id.imgClose);
         skbPlayerProgress = findViewById(R.id.skbPlayerProgress);
         txtCurrentTime = findViewById(R.id.txtCurrentTime);
         txtDuration = findViewById(R.id.txtDuration);
@@ -139,6 +140,14 @@ public abstract class AbstractActivity extends AppCompatActivity implements Play
                 }
             }
         });
+
+        imgClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                playerService.stopSong();
+            }
+        });
+
         skbPlayerProgress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -338,8 +347,9 @@ public abstract class AbstractActivity extends AppCompatActivity implements Play
 
     @Override
     public void playerPrepare() {
-        cardPlayer.setVisibility(View.VISIBLE);
+        lnlPlayer.setVisibility(View.VISIBLE);
         setProgressbarVisible(true);
+        Log.e(TAG, "playerPrepare: " + getClass().toString());
         skbPlayerProgress.setProgress(0);
         txtTitle.setText("Carregando buffer...");
         txtCurrentTime.setText("--:--");
@@ -351,7 +361,6 @@ public abstract class AbstractActivity extends AppCompatActivity implements Play
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Log.e(TAG, "playerCurrent: " + current + "  " + duration);
                 skbPlayerProgress.setMax(duration);
                 skbPlayerProgress.setProgress(current);
                 txtCurrentTime.setText(TimerUtils.transformMilisegs(current));
@@ -397,6 +406,7 @@ public abstract class AbstractActivity extends AppCompatActivity implements Play
 
     @Override
     public void playerStop() {
-
+        lnlPlayer.setVisibility(View.GONE);
+        playerPause();
     }
 }

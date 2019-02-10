@@ -2,7 +2,9 @@ package br.com.mrocigno.estalagemnerd.main.data;
 
 import com.google.gson.annotations.SerializedName;
 
-public class PodcastsModelVO {
+import java.io.Serializable;
+
+public class PodcastsModelVO implements Serializable {
 
     String title;
     String thumb;

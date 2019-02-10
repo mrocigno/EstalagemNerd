@@ -30,6 +30,8 @@ public class PlayerService extends Service {
     PlayerCallbacks callback;
     MediaPlayer mp;
     boolean paused = false;
+    boolean stoped = true;
+    boolean playing = false;
     String title;
 
     @Nullable
@@ -87,11 +89,14 @@ public class PlayerService extends Service {
             }
         });
 
-        if(mp.isPlaying() || paused){
+        if(playing || paused && !stoped){
             callback.playerPrepare();
             callback.playerStart(title);
             callback.playerCurrent(mp.getCurrentPosition(), mp.getDuration());
             if(!paused) timer();
+        }else{
+            stoped = true;
+            stopSong();
         }
     }
 
@@ -110,20 +115,21 @@ public class PlayerService extends Service {
     }
 
     public void prepareSong(final String url, String title){
+        playing = true;
         this.title = title;
         callback.playerPrepare();
         mp.reset();
-            new Thread(){
-                @Override
-                public void run() {
-                    try {
-                        mp.setDataSource(url);
-                        mp.prepare();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+        new Thread(){
+            @Override
+            public void run() {
+                try {
+                    mp.setDataSource(url);
+                    mp.prepare();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            }.start();
+            }
+        }.start();
     }
 
     public void playerSeek(int mseg){
@@ -131,20 +137,26 @@ public class PlayerService extends Service {
     }
 
     public void playSong(){
+        playing = true;
         paused = false;
+        stoped = false;
         mp.start();
         timer();
         callback.playerPlay();
     }
 
     public void pauseSong(){
+        playing = false;
         paused = true;
+        stoped = false;
         mp.pause();
         callback.playerPause();
     }
 
     public void stopSong(){
-        paused = true;
+        playing = false;
+        paused = false;
+        stoped = true;
         mp.stop();
         callback.playerStop();
     }
